@@ -60,7 +60,5 @@
     "watch": "*",
     "mongoose": "^4.4.14"
   },
-  "dependencies": {
-    "lodash": "^4.11.2"
-  }
+  "dependencies": {}
 }

@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 export default function createUniquePlugin (schema, options) {
   let paths = schema.indexes()
     .filter((index) => index[1].unique)
