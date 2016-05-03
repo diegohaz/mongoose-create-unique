@@ -36,7 +36,8 @@
     "mongodb",
     "plugin",
     "unique",
-    "create"
+    "create",
+    "index"
   ],
   "author": "Diego Haz <hazdiego@gmail.com>",
   "license": "MIT",
