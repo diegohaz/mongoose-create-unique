@@ -9,8 +9,11 @@ export default function createUniquePlugin (schema, options) {
     }
 
     if (Array.isArray(doc)) {
-      let promises = doc.map((d) => this.createUnique(d))
-      return Promise.all(promises)
+      let promises = [Promise.resolve()]
+      doc.forEach((d, i) => {
+        promises.push(promises[i].then(() => this.createUnique(d)))
+      })
+      return Promise.all(promises.slice(1))
     }
 
     let query = {}

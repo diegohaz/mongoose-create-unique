@@ -159,7 +159,7 @@ test("createUniquePlugin multiple compound", (t) => {
 })
 
 test("createUniquePlugin array", (t) => {
-  t.plan(6)
+  t.plan(7)
 
   let TestSchema = new mongoose.Schema({
     name: {
@@ -174,12 +174,13 @@ test("createUniquePlugin array", (t) => {
   Test.remove({}).then(() => {
     t.true(Test.createUnique, 'should exist create unique static method')
 
-    return Test.createUnique({name: 'Test'}, {name: 'test'})
+    return Test.createUnique({name: 'Test'}, {name: 'test'}, {name: 'Test'})
   }).then((results) => {
     doc = results[0]
     otherDoc = results[1]
     t.true(doc, 'should create a document')
     t.true(otherDoc, 'should create a document')
+    t.same(doc._id, results[2]._id, 'should return existing document')
 
     return Test.createUnique({name: 'Test'}, {name: 'aaa'})
   }).then((results) => {
