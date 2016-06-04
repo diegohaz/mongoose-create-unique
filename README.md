@@ -15,6 +15,13 @@
 npm install --save mongoose-create-unique
 ```
 
+## The problem
+
+If you try to create a document with a duplicate key, MongoDB and Mongoose will throw the following error:
+> E11000 duplicate key error collection: mydb.mycollection index: myfield_1 dup key: { : "my value" }'
+
+We want to avoid this error when creating a new document with unique field returning the existing one.
+
 ## Usage
 
 ```js
@@ -38,6 +45,15 @@ Artist.createUnique({name: 'Shakira'}).then(function(artist) {
   return Artist.createUnique({name: 'Shakira'});
 }).then(function(artist) {
   console.log(artist); // {_id: 1, name: 'Shakira'}
+});
+
+// or multiple
+Artist.createUnique(
+  {name: 'Shakira'}, 
+  {name: 'Rihanna'}, 
+  {name: 'Shakira'}
+).then(function(artists) {
+  // artists[0] and artists[2] are the same  
 })
 ```
 
