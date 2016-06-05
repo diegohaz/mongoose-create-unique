@@ -1,5 +1,5 @@
 import test from 'tape'
-import mongoose from 'mongoose'
+import mongoose, {Schema} from 'mongoose'
 import createUniquePlugin from '../src'
 
 mongoose.connect('mongodb://localhost/mongoose-create-unique-test')
@@ -8,13 +8,13 @@ mongoose.plugin(createUniquePlugin)
 test("createUniquePlugin not", (t) => {
   t.plan(4)
 
-  let TestSchema = new mongoose.Schema({
+  const TestSchema = new Schema({
     name: {
       type: String
     }
   })
 
-  let Test = mongoose.model('Test1', TestSchema)
+  const Test = mongoose.model('Test1', TestSchema)
   let doc
 
   Test.remove({}).then(() => {
@@ -38,14 +38,14 @@ test("createUniquePlugin not", (t) => {
 test("createUniquePlugin single", (t) => {
   t.plan(5)
 
-  let TestSchema = new mongoose.Schema({
+  const TestSchema = new Schema({
     name: {
       type: String,
       unique: true
     }
   })
 
-  let Test = mongoose.model('Test2', TestSchema)
+  const Test = mongoose.model('Test2', TestSchema)
   let doc
 
   Test.remove({}).then(() => {
@@ -73,7 +73,7 @@ test("createUniquePlugin single", (t) => {
 test("createUniquePlugin multiple", (t) => {
   t.plan(7)
 
-  let TestSchema = new mongoose.Schema({
+  const TestSchema = new Schema({
     name: {
       type: String,
       unique: true
@@ -84,7 +84,7 @@ test("createUniquePlugin multiple", (t) => {
     }
   })
 
-  let Test = mongoose.model('Test3', TestSchema)
+  const Test = mongoose.model('Test3', TestSchema)
   let doc, otherDoc
 
   Test.remove({}).then(() => {
@@ -121,10 +121,10 @@ test("createUniquePlugin multiple", (t) => {
 test("createUniquePlugin multiple compound", (t) => {
   t.plan(7)
 
-  let TestSchema = new mongoose.Schema({name: String, category: Number})
+  const TestSchema = new Schema({name: String, category: Number})
   TestSchema.index({name: 1, category: 1}, {unique: true})
 
-  let Test = mongoose.model('Test4', TestSchema)
+  const Test = mongoose.model('Test4', TestSchema)
   let doc, otherDoc
 
   Test.remove({}).then(() => {
@@ -161,14 +161,14 @@ test("createUniquePlugin multiple compound", (t) => {
 test("createUniquePlugin array", (t) => {
   t.plan(7)
 
-  let TestSchema = new mongoose.Schema({
+  const TestSchema = new Schema({
     name: {
       type: String,
       unique: true
     }
   })
 
-  let Test = mongoose.model('Test5', TestSchema)
+  const Test = mongoose.model('Test5', TestSchema)
   let doc, otherDoc
 
   Test.remove({}).then(() => {
@@ -186,6 +186,44 @@ test("createUniquePlugin array", (t) => {
   }).then((results) => {
     t.same(results[0]._id, doc._id, 'should return existing document when trying to create a duplicate')
     t.notSame(results[1]._id, otherDoc._id, 'should create a document')
+
+    return Test.remove({})
+  }).then(() => {
+    t.pass('should remove items')
+  }).catch(console.log)
+})
+
+test("createUniquePlugin id", (t) => {
+  t.plan(6)
+
+  const TestSchema = new Schema({
+    _id: {
+      type: String,
+      unique: true,
+      default: () => '234'
+    }
+  })
+
+  const Test = mongoose.model('Test6', TestSchema)
+  let doc
+
+  Test.remove({}).then(() => {
+    t.true(Test.createUnique, 'should exist create unique static method')
+
+    return Test.createUnique({_id: '123'}, {_id: '123'})
+  }).then((result) => {
+    doc = result[0]
+    const otherDoc = result[1]
+    t.true(result, 'should create a document')
+    t.equal(doc._id, otherDoc._id, 'should return existing document when trying to create a duplicate at same time')
+
+    return Test.createUnique({_id: '123'})
+  }).then((result) => {
+    t.same(result._id, doc._id, 'should return existing document when trying to create a duplicate')
+
+    return Test.createUnique({_id: '456'})
+  }).then((result) => {
+    t.notSame(result._id, doc._id, 'should create another document')
 
     return Test.remove({})
   }).then(() => {
