@@ -29,8 +29,14 @@ export default function createUniquePlugin (schema, options) {
       })
     }
 
-    return this.findOne(query).then((foundDoc) => {
-      return foundDoc ? foundDoc : doc.save()
+    return doc.save().then((doc) => {
+      return doc
+    }, (err) => {
+      if (err.name === 'MongoError' && err.code === 11000) {
+        return this.findOne(query)
+      } else {
+        throw err
+      }
     })
   }
 }
