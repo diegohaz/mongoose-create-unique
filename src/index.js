@@ -1,5 +1,5 @@
-export default function createUniquePlugin (schema, options) {
-  let paths = schema.indexes()
+const createUniquePlugin = (schema) => {
+  const paths = schema.indexes()
     .filter((index) => index[1].unique)
     .map((index) => Object.keys(index[0]))
 
@@ -40,3 +40,6 @@ export default function createUniquePlugin (schema, options) {
     })
   }
 }
+
+export default createUniquePlugin
+module.exports = exports = createUniquePlugin
