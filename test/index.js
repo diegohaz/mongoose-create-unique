@@ -36,12 +36,13 @@ test('createUniquePlugin not', (t) => {
 })
 
 test('createUniquePlugin single', (t) => {
-  t.plan(5)
+  t.plan(6)
 
   const TestSchema = new Schema({
     name: {
       type: String,
-      unique: true
+      unique: true,
+      required: true
     }
   })
 
@@ -64,6 +65,11 @@ test('createUniquePlugin single', (t) => {
   }).then((result) => {
     t.notSame(result._id, doc._id, 'should create another document')
 
+    return Test.createUnique({}, {}).then(() => {}, (err) => {
+      t.true(err, 'should throw mongo error')
+      return true
+    })
+  }).then(() => {
     return Test.remove({})
   }).then(() => {
     t.pass('should remove items')
@@ -229,6 +235,47 @@ test('createUniquePlugin id', (t) => {
   }).then(() => {
     t.pass('should remove items')
   }).catch(console.log)
+})
+
+test('createUniquePlugin single callback', (t) => {
+  t.plan(9)
+
+  const TestSchema = new Schema({
+    name: {
+      type: String,
+      unique: true,
+      required: true
+    }
+  })
+
+  const Test = mongoose.model('Test7', TestSchema)
+
+  Test.remove({}, () => {
+    t.true(Test.createUnique, 'should exist create unique static method')
+
+    Test.createUnique({name: 'Test'}, {name: 'Test'}, (err, [test1, test2]) => {
+      t.false(err, 'should not fail')
+      t.true(test1 && test2, 'should create a document')
+      t.same(test1._id, test2._id, 'should return existing document when trying to create duplicate at same time')
+
+      Test.createUnique({name: 'Test2'}, (err, doc) => {
+        t.false(err, 'should not fail')
+        t.true(doc, 'should create a document')
+
+        Test.createUnique({}, (err, result) => {
+          t.true(err, 'should throw mongo error')
+        })
+
+        Test.createUnique({}, {}, (err, result) => {
+          t.true(err, 'should throw mongo error')
+        })
+
+        Test.remove({}, () => {
+          t.pass('should remove items')
+        })
+      })
+    })
+  })
 })
 
 test.onFinish(() => {
