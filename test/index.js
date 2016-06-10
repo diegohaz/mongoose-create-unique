@@ -5,7 +5,7 @@ import createUniquePlugin from '../src'
 mongoose.connect('mongodb://localhost/mongoose-create-unique-test')
 mongoose.plugin(createUniquePlugin)
 
-test("createUniquePlugin not", (t) => {
+test('createUniquePlugin not', (t) => {
   t.plan(4)
 
   const TestSchema = new Schema({
@@ -35,7 +35,7 @@ test("createUniquePlugin not", (t) => {
   }).catch(console.log)
 })
 
-test("createUniquePlugin single", (t) => {
+test('createUniquePlugin single', (t) => {
   t.plan(5)
 
   const TestSchema = new Schema({
@@ -70,7 +70,7 @@ test("createUniquePlugin single", (t) => {
   }).catch(console.log)
 })
 
-test("createUniquePlugin multiple", (t) => {
+test('createUniquePlugin multiple', (t) => {
   t.plan(7)
 
   const TestSchema = new Schema({
@@ -118,7 +118,7 @@ test("createUniquePlugin multiple", (t) => {
   }).catch(console.log)
 })
 
-test("createUniquePlugin multiple compound", (t) => {
+test('createUniquePlugin multiple compound', (t) => {
   t.plan(7)
 
   const TestSchema = new Schema({name: String, category: Number})
@@ -158,7 +158,7 @@ test("createUniquePlugin multiple compound", (t) => {
   }).catch(console.log)
 })
 
-test("createUniquePlugin array", (t) => {
+test('createUniquePlugin array', (t) => {
   t.plan(7)
 
   const TestSchema = new Schema({
@@ -193,7 +193,7 @@ test("createUniquePlugin array", (t) => {
   }).catch(console.log)
 })
 
-test("createUniquePlugin id", (t) => {
+test('createUniquePlugin id', (t) => {
   t.plan(6)
 
   const TestSchema = new Schema({
