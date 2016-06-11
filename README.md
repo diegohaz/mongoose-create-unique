@@ -20,10 +20,15 @@ npm install --save mongoose-create-unique
 If you try to create a document with a duplicate key, MongoDB and Mongoose will throw the following error:
 > E11000 duplicate key error collection: mydb.mycollection index: myfield_1 dup key: { : "my value" }'
 
-We want to avoid this error when creating a new document with unique field returning the existing one.
+We want to avoid this error when creating a new document with unique field by returning the existing one.
 
-## Usage
+## How it works
 
+It was designed to work the same way [`Model.create`](http://mongoosejs.com/docs/api.html#model_Model.create) and [`Model#save`](http://mongoosejs.com/docs/api.html#model_Model-save) do. Just use `Model.createUnique` and `Model#saveUnique` instead. The only difference is that it will return the existing document(s) if there is already one, not an error.
+
+What `mongoose-create-unique` actually does is try to save the document(s). If Mongo throw the duplicate key error, it finds the existing document and returns it.
+
+## Example
 ```js
 var mongoose = require('mongoose');
 mongoose.plugin(require('mongoose-create-unique'));
@@ -49,8 +54,8 @@ Artist.createUnique({name: 'Shakira'}).then(function(artist) {
 
 // or multiple
 Artist.createUnique(
-  {name: 'Shakira'}, 
-  {name: 'Rihanna'}, 
+  {name: 'Shakira'},
+  {name: 'Rihanna'},
   {name: 'Shakira'}
 ).then(function(artists) {
   // artists[0] and artists[2] are the same  
