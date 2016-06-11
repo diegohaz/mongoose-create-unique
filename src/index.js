@@ -3,6 +3,36 @@ const createUniquePlugin = (schema) => {
     .filter((index) => index[1].unique)
     .map((index) => Object.keys(index[0]))
 
+  schema.methods.saveUnique = function (options, callback) {
+    if (typeof options === 'function') {
+      callback = options
+      options = undefined
+    }
+
+    return this.save(options).then((doc) => {
+      callback && callback(null, doc)
+      return doc
+    }, (err) => {
+      if (err.name === 'MongoError' && err.code === 11000) {
+        const makeOrQuery = (paths) => ({$or: paths.map((path) => makeAndQuery(path))})
+        const makeAndQuery = (paths) => {
+          let andQuery = {}
+          paths.forEach((path) => { andQuery[path] = this[path] })
+          return andQuery
+        }
+
+        const query = paths.length > 1 ? makeOrQuery(paths) : makeAndQuery(paths[0])
+        return this.constructor.findOne(query, callback)
+      } else {
+        if (callback) {
+          callback(err)
+        } else {
+          throw err
+        }
+      }
+    })
+  }
+
   schema.statics.createUnique = function (doc) {
     const args = [].slice.call(arguments)
     const lastArgument = args[args.length - 1]
@@ -17,11 +47,8 @@ const createUniquePlugin = (schema) => {
     }
 
     if (Array.isArray(doc)) {
-      let promises = [Promise.resolve()]
-      doc.forEach((d, i) => {
-        promises.push(promises[i].then(() => this.createUnique(d)))
-      })
-      return Promise.all(promises.slice(1)).then((result) => {
+      let promises = doc.map((d) => this.createUnique(d))
+      return Promise.all(promises).then((result) => {
         callback && callback(null, result)
         return result
       }, (err) => {
@@ -33,33 +60,9 @@ const createUniquePlugin = (schema) => {
       })
     }
 
-    let query = {}
     doc = new this(doc)
 
-    if (!paths.length) {
-      return doc.save(callback)
-    } else if (paths.length > 1) {
-      query = {$or: paths.map((path) => ({[path[0]]: doc[path[0]]}))}
-    } else {
-      paths[0].forEach((path) => {
-        query[path] = doc[path]
-      })
-    }
-
-    return doc.save().then((doc) => {
-      callback && callback(null, doc)
-      return doc
-    }, (err) => {
-      if (err.name === 'MongoError' && err.code === 11000) {
-        return this.findOne(query, callback)
-      } else {
-        if (callback) {
-          callback(err)
-        } else {
-          throw err
-        }
-      }
-    })
+    return doc.saveUnique(callback)
   }
 }
 

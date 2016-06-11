@@ -278,6 +278,39 @@ test('createUniquePlugin single callback', (t) => {
   })
 })
 
+test('createUniquePlugin saveUnique', (t) => {
+  t.plan(5)
+
+  const TestSchema = new Schema({
+    name: {
+      type: String,
+      unique: true,
+      required: true
+    }
+  })
+
+  const Test = mongoose.model('Test8', TestSchema)
+  let doc
+
+  Test.remove({}).then(() => {
+    doc = new Test({name: 'Test'})
+    t.true(doc.saveUnique, 'should exist saveUnique method')
+    return doc.saveUnique()
+  }).then((doc) => {
+    t.equal(doc.name, 'Test', 'should register document')
+    const otherDoc = new Test({name: 'Test'})
+    return otherDoc.saveUnique()
+  }).then((otherDoc) => {
+    t.same(doc._id, otherDoc._id, 'should return existing document when trying to save a duplicate')
+    return Test.find({name: 'Test'})
+  }).then((result) => {
+    t.equal(result.length, 1, 'should register only one document')
+    return Test.remove({})
+  }).then(() => {
+    t.pass('should remove items')
+  }).catch(console.log)
+})
+
 test.onFinish(() => {
   mongoose.disconnect()
 })
