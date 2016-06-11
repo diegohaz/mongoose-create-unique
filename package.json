@@ -37,7 +37,9 @@
     "plugin",
     "unique",
     "create",
-    "index"
+    "index",
+    "save",
+    "mongo"
   ],
   "author": "Diego Haz <hazdiego@gmail.com>",
   "license": "MIT",

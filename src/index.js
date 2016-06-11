@@ -47,8 +47,11 @@ const createUniquePlugin = (schema) => {
     }
 
     if (Array.isArray(doc)) {
-      let promises = doc.map((d) => this.createUnique(d))
-      return Promise.all(promises).then((result) => {
+      let promises = [Promise.resolve()]
+      doc.forEach((d, i) => {
+        promises.push(promises[i].then(() => this.createUnique(d)))
+      })
+      return Promise.all(promises.slice(1)).then((result) => {
         callback && callback(null, result)
         return result
       }, (err) => {
