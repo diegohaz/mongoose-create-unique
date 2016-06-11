@@ -63,8 +63,7 @@ const createUniquePlugin = (schema) => {
       })
     }
 
-    doc = new this(doc)
-
+    doc = doc instanceof this ? doc : new this(doc)
     return doc.saveUnique(callback)
   }
 }

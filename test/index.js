@@ -52,10 +52,10 @@ test('createUniquePlugin single', (t) => {
   Test.remove({}).then(() => {
     t.true(Test.createUnique, 'should exist create unique static method')
 
-    return Test.createUnique({name: 'Test'})
+    return Test.createUnique(new Test({name: 'Test'}))
   }).then((result) => {
     doc = result
-    t.true(result, 'should create a document')
+    t.true(result, 'should create a document by document instance')
 
     return Test.createUnique({name: 'Test'})
   }).then((result) => {
