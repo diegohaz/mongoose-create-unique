@@ -4,3 +4,9 @@ node_js:
   - v6
 after_script:
   - 'npm run coveralls'
+addons:
+  apt:
+    sources:
+    - mongodb-3.0-precise
+    packages:
+    - mongodb-org-server

@@ -15,6 +15,8 @@
 npm install --save mongoose-create-unique
 ```
 
+It works with MongoDB 3.0 or higher.
+
 ## The problem
 
 If you try to create a document with a duplicate key, MongoDB and Mongoose will throw the following error:
