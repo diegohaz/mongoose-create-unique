@@ -55,7 +55,7 @@
     "coveralls": "*",
     "dependency-check": "*",
     "doctoc": "*",
-    "eslint": "*",
+    "eslint": ">=3.14.0",
     "isparta": "*",
     "rimraf": "*",
     "tap-spec": "*",
